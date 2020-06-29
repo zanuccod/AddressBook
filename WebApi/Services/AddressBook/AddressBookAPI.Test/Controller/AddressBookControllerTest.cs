@@ -1,0 +1,118 @@
+﻿using System;
+using System.Threading.Tasks;
+using AddressBook.API.Controllers;
+using AddressBook.API.Domains;
+using AddressBook.API.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
+using NUnit.Framework;
+
+namespace AddressBookAPI.Test.Controller
+{
+    [TestFixture]
+    public class AddressBookControllerTest
+    {
+        private Mock<IContactService> _mockContactService;
+        private AddressBookController _controller;
+
+        [SetUp]
+        public void BeforeEachTest()
+        {
+            _mockContactService = new Mock<IContactService>();
+            _controller = new AddressBookController(_mockContactService.Object, new NullLogger<AddressBookController>());
+        }
+
+        [Test]
+        public async Task Find_ContactExists_ShouldReturnOk()
+        {
+            // Act
+            var item = new Contact
+            {
+                Id = 1,
+                Name = "testName",
+                Surname = "testSurname",
+                PhoneNumber = "123124"
+            };
+
+            _mockContactService.Setup(x => x.FindAsync(It.IsAny<uint>())).Returns(Task.FromResult(item));
+            var result = await _controller.Find(1);
+
+            // Assert
+            Assert.AreEqual(typeof(OkObjectResult), result.Result.GetType());
+
+            var objectResult = (OkObjectResult)result.Result;
+            Assert.AreEqual(item, objectResult.Value);
+        }
+
+        [Test]
+        public async Task Find_ContactNotExists_ShouldReturnNotFound()
+        {
+            // Act
+            var result = await _controller.Find(0);
+
+            // Assert
+            Assert.AreEqual(typeof(NotFoundObjectResult), result.Result.GetType());
+        }
+
+        [Test]
+        public async Task Insert_ItemNull_ShouldReturnBadRequest()
+        {
+            // Act
+            var result = await _controller.Insert(null);
+
+            // Assert
+            Assert.AreEqual(typeof(BadRequestObjectResult), result.Result.GetType());
+        }
+
+        [Test]
+        public async Task Insert_ItemNotNull_ShouldReturnOk()
+        {
+            // Act
+            var result = await _controller.Insert(new Contact());
+
+            // Assert
+            Assert.AreEqual(typeof(OkObjectResult), result.Result.GetType());
+        }
+
+        [Test]
+        public async Task Update_ItemNull_ShouldReturnBadRequest()
+        {
+            // Act
+            var result = await _controller.Update(null);
+
+            // Assert
+            Assert.AreEqual(typeof(BadRequestObjectResult), result.Result.GetType());
+        }
+
+        [Test]
+        public async Task Update_ItemNotNull_ShouldReturnOk()
+        {
+            // Act
+            var result = await _controller.Update(new Contact());
+
+            // Assert
+            Assert.AreEqual(typeof(OkObjectResult), result.Result.GetType());
+        }
+
+        [Test]
+        public async Task Delete_ItemNull_ShouldReturnBadRequest()
+        {
+            // Act
+            var result = await _controller.Delete(null);
+
+            // Assert
+            Assert.AreEqual(typeof(BadRequestObjectResult), result.Result.GetType());
+        }
+
+        [Test]
+        public async Task Delete_ItemNotNull_ShouldReturnOk()
+        {
+            // Act
+            var result = await _controller.Delete(new Contact());
+
+            // Assert
+            Assert.AreEqual(typeof(OkObjectResult), result.Result.GetType());
+        }
+    }
+}

@@ -29,7 +29,7 @@ namespace AddressBook.API.Controllers
             try
             {
                 var items = await _contactService.FindAllAsync();
-                _logger.LogDebug($"Response <{nameof(Ok)}>>, found <{items.Count}> contacts");
+                _logger.LogDebug($"Response <{nameof(Ok)}>, found <{items.Count}> contacts");
                 return Ok(items);
             }
             catch (Exception ex)
@@ -90,7 +90,7 @@ namespace AddressBook.API.Controllers
             }
         }
 
-        [HttpPost("update")]
+        [HttpPut("update")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult<Contact>> Update(Contact item)

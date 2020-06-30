@@ -5,16 +5,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using AddressBook.API.Domains;
 using Dapper;
+using Microsoft.Extensions.Configuration;
 
 namespace AddressBook.API.Models
 {
     public class ContactDataModelSQLIte : IContactDataModel
     {
         private readonly string _dbConnection;
+        private readonly IConfiguration _configuration;
 
-        public ContactDataModelSQLIte()
+        public ContactDataModelSQLIte(IConfiguration configuration)
         {
-            _dbConnection = "Data/AddressBook.db";
+            _configuration = configuration;
+            _dbConnection = _configuration.GetConnectionString("SQLiteDbConnection");
+
             CreateDatabaseIfNotExists();
         }
 

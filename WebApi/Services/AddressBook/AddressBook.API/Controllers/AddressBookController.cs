@@ -79,6 +79,8 @@ namespace AddressBook.API.Controllers
                 }
 
                 var result = await _contactService.InsertAsync(item);
+
+                item.Id = result;
                 _logger.LogDebug($"Response <{nameof(Ok)}>>, contact <{item}> inserted");
 
                 return CreatedAtAction(nameof(Find), new { id = result }, item);

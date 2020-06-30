@@ -39,10 +39,12 @@ namespace AddressBook.API.Services
             return await _contactDataModel.InsertAsync(item);
         }
 
-        public async Task<uint> UpdateAsync(Contact item)
+        public async Task<Contact> UpdateAsync(Contact item)
         {
             _logger.LogDebug("UpdateAsync: update element with id <{0}>", item.Id);
-            return await _contactDataModel.UpdateAsync(item);
+            await _contactDataModel.UpdateAsync(item);
+
+            return await _contactDataModel.FindAsync(item.Id);
         }
 
         public async Task DeleteAsync(uint id)

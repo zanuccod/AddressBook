@@ -39,7 +39,7 @@ namespace AddressBook.API.Controllers
             }
         }
 
-        [HttpGet("find")]
+        [HttpGet("find/{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult<Contact>> Find(uint id)
@@ -81,7 +81,7 @@ namespace AddressBook.API.Controllers
                 var result = await _contactService.InsertAsync(item);
                 _logger.LogDebug($"Response <{nameof(Ok)}>>, contact <{item}> inserted");
 
-                return Ok(item);
+                return CreatedAtAction(nameof(Find), new { id = result }, item);
             }
             catch (Exception ex)
             {
@@ -103,6 +103,13 @@ namespace AddressBook.API.Controllers
                     return BadRequest("contact not specified");
                 }
 
+                var found = await _contactService.FindAsync(item.Id);
+                if (found == null)
+                {
+                    _logger.LogDebug($"Response <{nameof(NotFound)}>, given contact with id <{item.Id}> not found");
+                    return NotFound();
+                }
+
                 var result = await _contactService.UpdateAsync(item);
                 _logger.LogDebug($"Response <{nameof(Ok)}>>, contact <{item}> updated");
 
@@ -115,23 +122,24 @@ namespace AddressBook.API.Controllers
             }
         }
 
-        [HttpDelete("delete")]
+        [HttpDelete("delete/{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<Contact>> Delete(Contact item)
+        public async Task<ActionResult<Contact>> Delete(uint id)
         {
             try
             {
+                var item = await _contactService.FindAsync(id);
                 if (item == null)
                 {
-                    _logger.LogDebug($"Response <{nameof(BadRequest)}>, given contact is null");
-                    return BadRequest("contact not specified");
+                    _logger.LogDebug($"Response <{nameof(NotFound)}>, given contact with id <{id}> not found");
+                    return NotFound();
                 }
 
-                await _contactService.DeleteAsync(item.Id);
-                _logger.LogDebug($"Response <{nameof(Ok)}>>, contact <{item}> deleted");
+                await _contactService.DeleteAsync(id);
+                _logger.LogDebug($"Response <{nameof(Ok)}>>, contact with <{id}> deleted");
 
-                return Ok(item);
+                return Ok(id);
             }
             catch (Exception ex)
             {

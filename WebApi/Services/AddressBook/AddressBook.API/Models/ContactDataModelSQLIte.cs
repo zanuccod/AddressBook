@@ -47,7 +47,10 @@ namespace AddressBook.API.Models
             await conn.OpenAsync();
 
             var sqlCmd = "INSERT INTO Contacts (Name, Surname, Nickname, PhoneNumber) VALUES (@Name, @Surname, @Nickname, @PhoneNumber)";
-            return (uint) await conn.ExecuteAsync(sqlCmd, item);
+            await conn.ExecuteAsync(sqlCmd, item);
+
+            // because sqlLite dosn't support "SELECT CAST(SCOPE_IDENTITY() as int)" to get last inserted id
+            return await conn.ExecuteScalarAsync<uint>("SELECT MAX(Id) FROM Contacts");
         }
 
         public async Task<uint> UpdateAsync(Contact item)

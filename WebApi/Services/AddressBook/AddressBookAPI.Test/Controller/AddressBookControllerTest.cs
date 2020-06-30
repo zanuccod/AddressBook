@@ -66,13 +66,13 @@ namespace AddressBookAPI.Test.Controller
         }
 
         [Test]
-        public async Task Insert_ItemNotNull_ShouldReturnOk()
+        public async Task Insert_ItemNotNull_ShouldReturnCreated()
         {
             // Act
             var result = await _controller.Insert(new Contact());
 
             // Assert
-            Assert.AreEqual(typeof(OkObjectResult), result.Result.GetType());
+            Assert.AreEqual(typeof(CreatedAtActionResult), result.Result.GetType());
         }
 
         [Test]
@@ -86,30 +86,27 @@ namespace AddressBookAPI.Test.Controller
         }
 
         [Test]
-        public async Task Update_ItemNotNull_ShouldReturnOk()
+        public async Task Update_ItemNotFound_ShouldReturnNotFound()
         {
             // Act
             var result = await _controller.Update(new Contact());
 
             // Assert
-            Assert.AreEqual(typeof(OkObjectResult), result.Result.GetType());
+            Assert.AreEqual(typeof(NotFoundResult), result.Result.GetType());
         }
 
         [Test]
-        public async Task Delete_ItemNull_ShouldReturnBadRequest()
+        public async Task Update_ItemNotNull_ShouldReturnOk()
         {
-            // Act
-            var result = await _controller.Delete(null);
-
             // Assert
-            Assert.AreEqual(typeof(BadRequestObjectResult), result.Result.GetType());
-        }
+            var item = new Contact
+            {
+                Id = 1
+            };
+            _mockContactService.Setup(x => x.FindAsync(item.Id)).Returns(Task.FromResult(item));
 
-        [Test]
-        public async Task Delete_ItemNotNull_ShouldReturnOk()
-        {
             // Act
-            var result = await _controller.Delete(new Contact());
+            var result = await _controller.Update(item);
 
             // Assert
             Assert.AreEqual(typeof(OkObjectResult), result.Result.GetType());

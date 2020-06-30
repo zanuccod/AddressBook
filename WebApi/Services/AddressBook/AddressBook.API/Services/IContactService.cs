@@ -9,7 +9,7 @@ namespace AddressBook.API.Services
         Task<ICollection<Contact>> FindAllAsync();
         Task<Contact> FindAsync(uint id);
         Task<uint> InsertAsync(Contact item);
-        Task<uint> UpdateAsync(Contact item);
+        Task<Contact> UpdateAsync(Contact item);
         Task DeleteAsync(uint id);
     }
 }

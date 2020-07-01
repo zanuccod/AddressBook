@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AddressBook.API.Domains;
 using AddressBook.API.Models;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 
 namespace AddressBook.API.Test.Models
@@ -16,7 +17,7 @@ namespace AddressBook.API.Test.Models
         public void BeforeEachTest()
         {
             // create new db file for test
-            dataModel = new ContactDataModelSQLIte(dbPath);
+            dataModel = new ContactDataModelSQLIte(dbPath, new NullLogger<ContactDataModelSQLIte>());
         }
 
         [TearDown]

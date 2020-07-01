@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AddressBook.API.Domains;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace AddressBook.API.Models
 {
@@ -13,18 +14,22 @@ namespace AddressBook.API.Models
     {
         private readonly string _dbConnection;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<ContactDataModelSQLIte> _logger;
 
-        public ContactDataModelSQLIte(IConfiguration configuration)
+        public ContactDataModelSQLIte(IConfiguration configuration, ILogger<ContactDataModelSQLIte> logger)
         {
             _configuration = configuration;
-            _dbConnection = _configuration.GetConnectionString("SQLiteDbConnection");
+            _logger = logger;
 
+            _dbConnection = _configuration.GetConnectionString("SQLiteDbConnection");
             CreateDatabaseIfNotExists();
         }
 
-        public ContactDataModelSQLIte(string dbConnection)
+        public ContactDataModelSQLIte(string dbConnection, ILogger<ContactDataModelSQLIte> logger)
         {
             _dbConnection = dbConnection;
+            _logger = logger;
+
             CreateDatabaseIfNotExists();
         }
 
@@ -50,11 +55,10 @@ namespace AddressBook.API.Models
             using var conn = GetDbConnection();
             await conn.OpenAsync();
 
-            var sqlCmd = "INSERT INTO Contacts (Name, Surname, Nickname, PhoneNumber) VALUES (@Name, @Surname, @Nickname, @PhoneNumber)";
-            await conn.ExecuteAsync(sqlCmd, item);
+            var sqlCmd = "INSERT INTO Contacts (Name, Surname, Nickname, PhoneNumber) VALUES (@Name, @Surname, @Nickname, @PhoneNumber);";
+            sqlCmd += "SELECT MAX(Id) FROM Contacts;";
 
-            // because sqlLite dosn't support "SELECT CAST(SCOPE_IDENTITY() as int)" to get last inserted id
-            return await conn.ExecuteScalarAsync<uint>("SELECT MAX(Id) FROM Contacts");
+            return await conn.ExecuteScalarAsync<uint>(sqlCmd, item);
         }
 
         public async Task<uint> UpdateAsync(Contact item)
@@ -81,8 +85,11 @@ namespace AddressBook.API.Models
 
         private void CreateDatabaseIfNotExists()
         {
+            _logger.LogInformation("Source database <{0}>", _dbConnection);
             if (File.Exists(_dbConnection))
                 return;
+
+            _logger.LogInformation("Database <{0}> not exists, creating it", _dbConnection);
 
             Directory.CreateDirectory("Data");
             SQLiteConnection.CreateFile(_dbConnection);
@@ -98,6 +105,9 @@ namespace AddressBook.API.Models
             contactsTable += "PhoneNumber text NOT NULL)";
 
             conn.Execute(contactsTable);
+
+            _logger.LogInformation("Database created");
+
         }
     }
 }

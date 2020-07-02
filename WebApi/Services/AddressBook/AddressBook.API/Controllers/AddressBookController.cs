@@ -42,7 +42,7 @@ namespace AddressBook.API.Controllers
         [HttpGet("find/{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<Contact>> Find(uint id)
+        public async Task<ActionResult<Contact>> Find(int id)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace AddressBook.API.Controllers
         [HttpDelete("delete/{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<Contact>> Delete(uint id)
+        public async Task<ActionResult<Contact>> Delete(int id)
         {
             try
             {

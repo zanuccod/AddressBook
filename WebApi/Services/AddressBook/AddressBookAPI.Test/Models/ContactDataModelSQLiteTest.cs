@@ -8,16 +8,16 @@ using NUnit.Framework;
 namespace AddressBook.API.Test.Models
 {
     [TestFixture]
-    public class ContactDataModelSQLIteTest
+    public class ContactDataModelSQLiteTest
     {
-        private ContactDataModelSQLIte dataModel;
+        private ContactDataModelSQLite _dataModel;
         private const string dbPath = "dbSqLiteTest";
 
         [SetUp]
         public void BeforeEachTest()
         {
             // create new db file for test
-            dataModel = new ContactDataModelSQLIte(dbPath, new NullLogger<ContactDataModelSQLIte>());
+            _dataModel = new ContactDataModelSQLite(dbPath, new NullLogger<ContactDataModelSQLite>());
         }
 
         [TearDown]
@@ -42,10 +42,10 @@ namespace AddressBook.API.Test.Models
 
             /****** INSERT *******/
             // Act
-            var insertedId = await dataModel.InsertAsync(item).ConfigureAwait(true);
+            var insertedId = await _dataModel.InsertAsync(item).ConfigureAwait(true);
 
             // Assert
-            var insertedItem = await dataModel.FindAsync(insertedId).ConfigureAwait(true);
+            var insertedItem = await _dataModel.FindAsync(insertedId).ConfigureAwait(true);
 
             Assert.AreEqual(item.Name, insertedItem.Name);
             Assert.AreEqual(item.Surname, insertedItem.Surname);
@@ -54,10 +54,10 @@ namespace AddressBook.API.Test.Models
             /****** UPDATE *******/
             // Act
             insertedItem.Name = "testName_1";
-            var result = await dataModel.UpdateAsync(insertedItem).ConfigureAwait(true);
+            var result = await _dataModel.UpdateAsync(insertedItem).ConfigureAwait(true);
 
             // Assert
-            item = await dataModel.FindAsync(insertedItem.Id).ConfigureAwait(true);
+            item = await _dataModel.FindAsync(insertedItem.Id).ConfigureAwait(true);
             Assert.AreEqual(1, result);
 
             Assert.AreEqual(item.Name, "testName_1");
@@ -66,10 +66,10 @@ namespace AddressBook.API.Test.Models
 
             /****** DELETE *******/
             // Act
-            await dataModel.DeleteAsync(insertedItem.Id).ConfigureAwait(true);
+            await _dataModel.DeleteAsync(insertedItem.Id).ConfigureAwait(true);
 
             // Assert
-            var items = await dataModel.FindAllAsync().ConfigureAwait(true);
+            var items = await _dataModel.FindAllAsync().ConfigureAwait(true);
 
             Assert.AreEqual(0, items.Count);
         }
@@ -81,7 +81,7 @@ namespace AddressBook.API.Test.Models
             var itemCount = 10;
             for (uint i = 1; i <= itemCount; i++)
             {
-                await dataModel.InsertAsync(new Contact
+                await _dataModel.InsertAsync(new Contact
                 {
                     Name = $"testName_{i}",
                     Surname = $"testSurname_{i}",
@@ -90,7 +90,7 @@ namespace AddressBook.API.Test.Models
             }
 
             // Act
-            var items = await dataModel.FindAllAsync().ConfigureAwait(true);
+            var items = await _dataModel.FindAllAsync().ConfigureAwait(true);
 
             // Assert
             Assert.AreEqual(itemCount, items.Count);

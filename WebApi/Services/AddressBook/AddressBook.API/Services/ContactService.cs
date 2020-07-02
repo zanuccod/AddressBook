@@ -25,7 +25,7 @@ namespace AddressBook.API.Services
             return items;
         }
 
-        public async Task<Contact> FindAsync(uint id)
+        public async Task<Contact> FindAsync(int id)
         {
             _logger.LogDebug("FindAsync: start search for element with id <{0}>", id);
 
@@ -33,7 +33,7 @@ namespace AddressBook.API.Services
             return item;
         }
 
-        public async Task<uint> InsertAsync(Contact item)
+        public async Task<int> InsertAsync(Contact item)
         {
             _logger.LogDebug("InsertAsync: insert element <{0}>", item.ToString());
             return await _contactDataModel.InsertAsync(item);
@@ -47,7 +47,7 @@ namespace AddressBook.API.Services
             return await _contactDataModel.FindAsync(item.Id);
         }
 
-        public async Task DeleteAsync(uint id)
+        public async Task DeleteAsync(int id)
         {
             _logger.LogDebug("DeleteAsync: delete element with id <{0}>", id);
             await _contactDataModel.DeleteAsync(id);

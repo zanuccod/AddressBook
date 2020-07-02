@@ -7,9 +7,9 @@ namespace AddressBook.API.Services
     public interface IContactService
     {
         Task<ICollection<Contact>> FindAllAsync();
-        Task<Contact> FindAsync(uint id);
-        Task<uint> InsertAsync(Contact item);
+        Task<Contact> FindAsync(int id);
+        Task<int> InsertAsync(Contact item);
         Task<Contact> UpdateAsync(Contact item);
-        Task DeleteAsync(uint id);
+        Task DeleteAsync(int id);
     }
 }

@@ -35,7 +35,7 @@ namespace AddressBookAPI.Test.Controller
                 PhoneNumber = "123124"
             };
 
-            _mockContactService.Setup(x => x.FindAsync(It.IsAny<uint>())).Returns(Task.FromResult(item));
+            _mockContactService.Setup(x => x.FindAsync(It.IsAny<int>())).Returns(Task.FromResult(item));
             var result = await _controller.Find(1);
 
             // Assert

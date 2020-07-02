@@ -29,8 +29,23 @@ namespace AddressBook.API
         {
             services.AddControllers();
 
-            services.AddSingleton<IContactDataModel, ContactDataModelSQLIte>();
             services.AddSingleton<IContactService, ContactService>();
+
+            AddDataModel(services);
+        }
+
+        private void AddDataModel(IServiceCollection services)
+        {
+            var targetDatabase = Configuration.GetValue<string>("TargetDatabase");
+            switch (targetDatabase)
+            {
+                case "SqlServer":
+                    services.AddSingleton<IContactDataModel, ContactDataModelSQLServer>();
+                    break;
+                case "SqlLite":
+                    services.AddSingleton<IContactDataModel, ContactDataModelSQLite>();
+                    break;
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

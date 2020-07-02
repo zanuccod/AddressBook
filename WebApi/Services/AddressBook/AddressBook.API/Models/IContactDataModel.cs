@@ -4,5 +4,6 @@ namespace AddressBook.API.Models
 {
     public interface IContactDataModel : IDataModel<Contact>
     {
+        void CreateDatabaseIfNotExists();
     }
 }

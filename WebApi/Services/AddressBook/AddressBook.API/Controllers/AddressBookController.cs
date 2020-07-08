@@ -11,6 +11,7 @@ namespace AddressBook.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Produces("application/json")]
     public class AddressBookController : ControllerBase
     {
         private readonly IContactService _contactService;
@@ -29,7 +30,7 @@ namespace AddressBook.API.Controllers
             try
             {
                 var items = await _contactService.FindAllAsync();
-                _logger.LogDebug($"Response <{nameof(Ok)}>, found <{items.Count}> contacts");
+                _logger.LogDebug("Response <{Response}>, found <{count}> contacts", nameof(Ok), items.Count);
                 return Ok(items);
             }
             catch (Exception ex)
@@ -49,12 +50,12 @@ namespace AddressBook.API.Controllers
                 var item = await _contactService.FindAsync(id);
                 if (item != null)
                 {
-                    _logger.LogDebug($"Response <{nameof(Ok)}>>, contact with id <{item.Id}> found");
+                    _logger.LogDebug("Response <{Response}>, contact with id <{id}> found", nameof(Ok), item.Id);
                     return Ok(item);
                 }
                 else
                 {
-                    _logger.LogDebug($"Response <{nameof(NotFound)}>>, contact with id <{id}> not found");
+                    _logger.LogDebug("Response <{Response}>, contact with id <{id}> not found", nameof(NotFound), id);
                     return NotFound(id);
                 }
             }
@@ -74,14 +75,14 @@ namespace AddressBook.API.Controllers
             {
                 if (item == null)
                 {
-                    _logger.LogDebug($"Response <{nameof(BadRequest)}>, given contact is null");
+                    _logger.LogDebug("Response <{Response}>, given contact is null", nameof(BadRequest));
                     return BadRequest("contact not specified");
                 }
 
                 var result = await _contactService.InsertAsync(item);
 
                 item.Id = result;
-                _logger.LogDebug($"Response <{nameof(Ok)}>>, contact <{item}> inserted");
+                _logger.LogDebug("Response <{Response}>, contact <{item}> inserted", nameof(Ok), item);
 
                 return CreatedAtAction(nameof(Find), new { id = result }, item);
             }
@@ -101,19 +102,19 @@ namespace AddressBook.API.Controllers
             {
                 if (item == null)
                 {
-                    _logger.LogDebug($"Response <{nameof(BadRequest)}>, given contact is null");
+                    _logger.LogDebug("Response <{Response}>, given contact is null", nameof(BadRequest));
                     return BadRequest("contact not specified");
                 }
 
                 var found = await _contactService.FindAsync(item.Id);
                 if (found == null)
                 {
-                    _logger.LogDebug($"Response <{nameof(NotFound)}>, given contact with id <{item.Id}> not found");
+                    _logger.LogDebug("Response <{Response}>, given contact with id <{id}> not found", nameof(NotFound), item.Id);
                     return NotFound();
                 }
 
                 var result = await _contactService.UpdateAsync(item);
-                _logger.LogDebug($"Response <{nameof(Ok)}>>, contact <{item}> updated");
+                _logger.LogDebug("Response <{Response}>, contact <{item}> updated", nameof(Ok), item);
 
                 return Ok(item);
             }
@@ -134,12 +135,12 @@ namespace AddressBook.API.Controllers
                 var item = await _contactService.FindAsync(id);
                 if (item == null)
                 {
-                    _logger.LogDebug($"Response <{nameof(NotFound)}>, given contact with id <{id}> not found");
+                    _logger.LogDebug("Response <{Response}>, given contact with id <{id}> not found", nameof(NotFound), id);
                     return NotFound();
                 }
 
                 await _contactService.DeleteAsync(id);
-                _logger.LogDebug($"Response <{nameof(Ok)}>>, contact with <{id}> deleted");
+                _logger.LogDebug("Response <{Response}>>, contact with <{id}> deleted", nameof(Ok), id);
 
                 return Ok(id);
             }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AddressBook.API.Controllers;
 using AddressBook.API.Domains;
 using AddressBook.API.Services;
@@ -46,10 +45,20 @@ namespace AddressBookAPI.Test.Controller
         }
 
         [Test]
-        public async Task Find_ContactNotExists_ShouldReturnNotFound()
+        public async Task Find_NotValidId_ShouldReturnBadRequest()
         {
             // Act
             var result = await _controller.Find(0);
+
+            // Assert
+            Assert.AreEqual(typeof(BadRequestObjectResult), result.Result.GetType());
+        }
+
+        [Test]
+        public async Task Find_ContactsNotExists_ShouldReturnNotFound()
+        {
+            // Act
+            var result = await _controller.Find(1);
 
             // Assert
             Assert.AreEqual(typeof(NotFoundObjectResult), result.Result.GetType());
@@ -110,6 +119,16 @@ namespace AddressBookAPI.Test.Controller
 
             // Assert
             Assert.AreEqual(typeof(OkObjectResult), result.Result.GetType());
+        }
+
+        [Test]
+        public async Task Delete_NotValidId_ShouldReturnBadRequest()
+        {
+            // Act
+            var result = await _controller.Delete(0);
+
+            // Assert
+            Assert.AreEqual(typeof(BadRequestObjectResult), result.Result.GetType());
         }
     }
 }

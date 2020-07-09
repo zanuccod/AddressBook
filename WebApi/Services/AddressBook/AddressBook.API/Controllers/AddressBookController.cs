@@ -10,8 +10,8 @@ using Microsoft.Extensions.Logging;
 namespace AddressBook.API.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
     [Produces("application/json")]
+    [ApiController]
     public class AddressBookController : ControllerBase
     {
         private readonly IContactService _contactService;
@@ -50,7 +50,7 @@ namespace AddressBook.API.Controllers
                 if (id < 1)
                 {
                     _logger.LogDebug("Response <{Response}>, given id is not valid", nameof(BadRequest), id);
-                    return BadRequest();
+                    return BadRequest("given id is not valid");
                 }
 
                 var item = await _contactService.FindAsync(id);
@@ -157,7 +157,7 @@ namespace AddressBook.API.Controllers
                 if (id < 1)
                 {
                     _logger.LogDebug("Response <{Response}>, given id is not valid", nameof(BadRequest), id);
-                    return BadRequest();
+                    return BadRequest("given id is not valid");
                 }
 
                 var item = await _contactService.FindAsync(id);

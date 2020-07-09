@@ -47,6 +47,12 @@ namespace AddressBook.API.Controllers
         {
             try
             {
+                if (id < 1)
+                {
+                    _logger.LogDebug("Response <{Response}>, given id is not valid", nameof(BadRequest), id);
+                    return BadRequest();
+                }
+
                 var item = await _contactService.FindAsync(id);
                 if (item != null)
                 {
@@ -79,12 +85,19 @@ namespace AddressBook.API.Controllers
                     return BadRequest("contact not specified");
                 }
 
-                var result = await _contactService.InsertAsync(item);
+                if (ModelState.IsValid)
+                {
+                    var result = await _contactService.InsertAsync(item);
 
-                item.Id = result;
-                _logger.LogDebug("Response <{Response}>, contact <{item}> inserted", nameof(Ok), item);
+                    item.Id = result;
+                    _logger.LogDebug("Response <{Response}>, contact <{item}> inserted", nameof(Ok), item);
 
-                return CreatedAtAction(nameof(Find), new { id = result }, item);
+                    return CreatedAtAction(nameof(Find), new { id = result }, item);
+                }
+                else
+                {
+                    return BadRequest(ModelState);
+                }
             }
             catch (Exception ex)
             {
@@ -96,6 +109,7 @@ namespace AddressBook.API.Controllers
         [HttpPut("update")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult<Contact>> Update(Contact item)
         {
             try
@@ -113,10 +127,17 @@ namespace AddressBook.API.Controllers
                     return NotFound();
                 }
 
-                var result = await _contactService.UpdateAsync(item);
-                _logger.LogDebug("Response <{Response}>, contact <{item}> updated", nameof(Ok), item);
+                if (ModelState.IsValid)
+                {
+                    var result = await _contactService.UpdateAsync(item);
+                    _logger.LogDebug("Response <{Response}>, contact <{item}> updated", nameof(Ok), item);
 
-                return Ok(item);
+                    return Ok(item);
+                }
+                else
+                {
+                    return BadRequest(ModelState);
+                }
             }
             catch (Exception ex)
             {
@@ -128,10 +149,17 @@ namespace AddressBook.API.Controllers
         [HttpDelete("delete/{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult<Contact>> Delete(int id)
         {
             try
             {
+                if (id < 1)
+                {
+                    _logger.LogDebug("Response <{Response}>, given id is not valid", nameof(BadRequest), id);
+                    return BadRequest();
+                }
+
                 var item = await _contactService.FindAsync(id);
                 if (item == null)
                 {

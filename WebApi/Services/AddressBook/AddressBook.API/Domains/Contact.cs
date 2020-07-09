@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,11 +10,17 @@ namespace AddressBook.API.Domains
     {
         // autoincrement
         [Key]
+        [Range(1, int.MaxValue)]
         public int Id { get; set; }
 
+        [Required]
         public string Name { get; set; }
+        [Required]
         public string Surname { get; set; }
         public string Nickname { get; set; }
+
+        [Required]
+        [RegularExpression("^(\\+)?[0-9]{0,15}")]
         public string PhoneNumber { get; set; }
 
         #region Overridden Methods

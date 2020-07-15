@@ -30,6 +30,8 @@ namespace AddressBook.API
             });
             services.AddSwaggerGenNewtonsoftSupport();
 
+            services.AddMemoryCache();
+
             services.AddSingleton<IContactService, ContactService>();
 
             AddDataModel(services);

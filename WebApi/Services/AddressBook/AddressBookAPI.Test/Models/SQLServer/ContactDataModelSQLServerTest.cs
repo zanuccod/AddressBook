@@ -1,32 +1,50 @@
-﻿using System.IO;
+﻿using System;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 using AddressBook.API.Domains;
 using AddressBook.API.Models;
+using Dapper;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 
-namespace AddressBook.API.Test.Models
+namespace AddressBookAPI.Test.Models.SQLServer
 {
     [TestFixture]
-    public class ContactDataModelSQLiteTest
+    public class ContactDataModelSQLServerTest
     {
-        private ContactDataModelSQLite _dataModel;
-        private const string dbPath = "dbSqLiteTest";
+        private ContactDataModelSQLServer _dataModel;
+        private SqlConnectionStringBuilder builder;
 
-        [SetUp]
-        public void BeforeEachTest()
+        const string connString = "Server=localhost;Database=TutorialDbTest;user id=sa;password=reallyStrongPwd#123;Application Name=AddressBook.API;";
+
+        [OneTimeSetUp]
+        public void BeforeAllTests()
         {
-            // create new db file for test
-            _dataModel = new ContactDataModelSQLite(dbPath, new NullLogger<ContactDataModelSQLite>());
+            builder = new SqlConnectionStringBuilder(connString);
+
+            // force to create TutorialDbTest database with needed tables for tests
+            _dataModel = new ContactDataModelSQLServer(builder.ConnectionString, new NullLogger<ContactDataModelSQLServer>());
+        }
+
+        [OneTimeTearDown]
+        public void AfterAllTests()
+        {
+            // delete test database
+            builder.InitialCatalog = "master";
+            using var conn = new SqlConnection(builder.ConnectionString);
+            conn.OpenAsync();
+
+            conn.ExecuteAsync($"DROP DATABASE TutorialDbTest").ConfigureAwait(true);
         }
 
         [TearDown]
         public void AfterEachTest()
         {
-            // delete all database files generated for test
-            var files = Directory.GetFiles(Path.GetDirectoryName(Path.GetFullPath(dbPath)), dbPath + ".*");
-            foreach (var file in files)
-                File.Delete(file);
+            using var conn = new SqlConnection(builder.ConnectionString);
+            conn.OpenAsync();
+
+            // delete all data on Contacts table to reset conditions for tests
+            conn.Execute($"DELETE FROM Contacts");
         }
 
         [Test]

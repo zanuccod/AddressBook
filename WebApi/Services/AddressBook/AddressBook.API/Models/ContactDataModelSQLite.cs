@@ -4,67 +4,28 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AddressBook.API.Domains;
+using AddressBook.API.Models.BaseModels;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace AddressBook.API.Models
 {
-    public class ContactDataModelSQLite : IContactDataModel
+    public class ContactDataModelSQLite : SQLiteDataModelBase, IContactDataModel
     {
-        private readonly string _dbConnection;
-        private readonly IConfiguration _configuration;
-        private readonly ILogger<ContactDataModelSQLite> _logger;
-
         #region Constructors
 
         public ContactDataModelSQLite(IConfiguration configuration, ILogger<ContactDataModelSQLite> logger)
-        {
-            _configuration = configuration;
-            _logger = logger;
+            : base(configuration, logger)
+        { }
 
-            _dbConnection = _configuration.GetConnectionString("SQLiteDbConnection");
-            CreateDatabaseIfNotExists();
-        }
-
-        public ContactDataModelSQLite(string dbConnection, ILogger<ContactDataModelSQLite> logger)
-        {
-            _dbConnection = dbConnection;
-            _logger = logger;
-
-            CreateDatabaseIfNotExists();
-        }
+        public ContactDataModelSQLite(string _connectionString, ILogger<ContactDataModelSQLite> logger)
+            :base(_connectionString, logger)
+        { }
 
         #endregion
 
         #region Public Methods
-
-        public void CreateDatabaseIfNotExists()
-        {
-            _logger.LogInformation("Source database <{0}>", _dbConnection);
-            if (File.Exists(_dbConnection))
-                return;
-
-            _logger.LogInformation("Database <{0}> not exists, creating it", _dbConnection);
-
-            Directory.CreateDirectory("Data");
-            SQLiteConnection.CreateFile(_dbConnection);
-
-            using var conn = GetDbConnection();
-            conn.Open();
-
-            var contactsTable = "CREATE TABLE IF NOT EXISTS Contacts (";
-            contactsTable += "Id integer PRIMARY KEY AUTOINCREMENT, ";
-            contactsTable += "Name text NOT NULL, ";
-            contactsTable += "Surname text NOT NULL, ";
-            contactsTable += "Nickname text NULL, ";
-            contactsTable += "PhoneNumber text NOT NULL)";
-
-            conn.Execute(contactsTable);
-
-            _logger.LogInformation("Database created");
-
-        }
 
         public async Task<ICollection<Contact>> FindAllAsync()
         {
@@ -109,15 +70,6 @@ namespace AddressBook.API.Models
             await conn.OpenAsync();
 
             await conn.ExecuteAsync("DELETE FROM Contacts WHERE id = @contactId", new { contactId = id });
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private SQLiteConnection GetDbConnection()
-        {
-            return new SQLiteConnection($"Data Source={_dbConnection}");
         }
 
         #endregion

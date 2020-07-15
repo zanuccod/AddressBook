@@ -7,12 +7,11 @@ using Dapper;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 
-namespace AddressBookAPI.Test.Models
+namespace AddressBookAPI.Test.Models.SQLServer
 {
-    [TestFixture]
-    public class ContactDataModelSQLServerTest
+    public class CountryDataModelSQLServerTest
     {
-        private ContactDataModelSQLServer _dataModel;
+        private CountryDataModelSQServer _dataModel;
         private SqlConnectionStringBuilder builder;
 
         const string connString = "Server=localhost;Database=TutorialDbTest;user id=sa;password=reallyStrongPwd#123;Application Name=AddressBook.API;";
@@ -23,7 +22,7 @@ namespace AddressBookAPI.Test.Models
             builder = new SqlConnectionStringBuilder(connString);
 
             // force to create TutorialDbTest database with needed tables for tests
-            _dataModel = new ContactDataModelSQLServer(builder.ConnectionString, new NullLogger<ContactDataModelSQLServer>());
+            _dataModel = new CountryDataModelSQServer(builder.ConnectionString, new NullLogger<CountryDataModelSQServer>());
         }
 
         [OneTimeTearDown]
@@ -44,18 +43,17 @@ namespace AddressBookAPI.Test.Models
             conn.OpenAsync();
 
             // delete all data on Contacts table to reset conditions for tests
-            conn.ExecuteAsync($"DELETE FROM Contacts").ConfigureAwait(true);
+            conn.Execute($"DELETE FROM Countries");
         }
 
         [Test]
         public async Task TestCRUD()
         {
             // Arrange
-            var item = new Contact
+            var item = new Country
             {
-                Name = "testName",
-                Surname = "testSurname",
-                PhoneNumber = "123124"
+                Name = "United States of America",
+                ISOCode = "USA"
             };
 
             /****** INSERT *******/
@@ -66,8 +64,7 @@ namespace AddressBookAPI.Test.Models
             var insertedItem = await _dataModel.FindAsync(insertedId).ConfigureAwait(true);
 
             Assert.AreEqual(item.Name, insertedItem.Name);
-            Assert.AreEqual(item.Surname, insertedItem.Surname);
-            Assert.AreEqual(item.PhoneNumber, insertedItem.PhoneNumber);
+            Assert.AreEqual(item.ISOCode, insertedItem.ISOCode);
 
             /****** UPDATE *******/
             // Act
@@ -79,8 +76,7 @@ namespace AddressBookAPI.Test.Models
             Assert.AreEqual(1, result);
 
             Assert.AreEqual(item.Name, "testName_1");
-            Assert.AreEqual(item.Surname, insertedItem.Surname);
-            Assert.AreEqual(item.PhoneNumber, insertedItem.PhoneNumber);
+            Assert.AreEqual(item.ISOCode, insertedItem.ISOCode);
 
             /****** DELETE *******/
             // Act
@@ -99,11 +95,10 @@ namespace AddressBookAPI.Test.Models
             var itemCount = 10;
             for (uint i = 1; i <= itemCount; i++)
             {
-                await _dataModel.InsertAsync(new Contact
+                await _dataModel.InsertAsync(new Country
                 {
-                    Name = $"testName_{i}",
-                    Surname = $"testSurname_{i}",
-                    PhoneNumber = $"123124{i}"
+                    Name = "United States of America",
+                    ISOCode = "USA"
                 }).ConfigureAwait(true);
             }
 

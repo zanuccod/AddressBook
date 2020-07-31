@@ -21,13 +21,13 @@ namespace AddressBook.API.Services
         {
             var items = await _contactDataModel.FindAllAsync();
 
-            _logger.LogDebug("FindAllAsync: find {0} elements", items.Count);
+            _logger.LogDebug("FindAllAsync: find {count} elements", items.Count);
             return items;
         }
 
         public async Task<Contact> FindAsync(int id)
         {
-            _logger.LogDebug("FindAsync: start search for element with id <{0}>", id);
+            _logger.LogDebug("FindAsync: start search for element with id <{id}>", id);
 
             var item = await _contactDataModel.FindAsync(id);
             return item;
@@ -35,13 +35,13 @@ namespace AddressBook.API.Services
 
         public async Task<int> InsertAsync(Contact item)
         {
-            _logger.LogDebug("InsertAsync: insert element <{0}>", item.ToString());
+            _logger.LogDebug("InsertAsync: insert element <{item}>", item);
             return await _contactDataModel.InsertAsync(item);
         }
 
         public async Task<Contact> UpdateAsync(Contact item)
         {
-            _logger.LogDebug("UpdateAsync: update element with id <{0}>", item.Id);
+            _logger.LogDebug("UpdateAsync: update element with id <{id}>", item.Id);
             await _contactDataModel.UpdateAsync(item);
 
             return await _contactDataModel.FindAsync(item.Id);
@@ -49,7 +49,7 @@ namespace AddressBook.API.Services
 
         public async Task DeleteAsync(int id)
         {
-            _logger.LogDebug("DeleteAsync: delete element with id <{0}>", id);
+            _logger.LogDebug("DeleteAsync: delete element with id <{id}>", id);
             await _contactDataModel.DeleteAsync(id);
         }
     }

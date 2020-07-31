@@ -38,7 +38,7 @@ namespace AddressBook.API.Services
 
         public async Task<Country> FindByIdAsync(int id)
         {
-            _logger.LogDebug("FindByIdAsync: start search for element with id <{0}>", id);
+            _logger.LogDebug("FindByIdAsync: start search for element with id <{id}>", id);
 
             var items = await FindAllAsync();
             return items.FirstOrDefault(x => x.Id == id);
@@ -46,7 +46,7 @@ namespace AddressBook.API.Services
 
         public async Task<Country> FindByISOCodeAsync(string code)
         {
-            _logger.LogDebug("FindByISOCodeAsync: start search for element with ISOCode <{0}>", code);
+            _logger.LogDebug("FindByISOCodeAsync: start search for element with ISOCode <{isoCode}>", code);
 
             var items = await FindAllAsync();
             return items.FirstOrDefault(x => x.ISOCode.Equals(code));

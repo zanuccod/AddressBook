@@ -46,7 +46,7 @@ namespace AddressBook.API.Domains
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id, Name);
+            return HashCode.Combine(Id, Name, ISOCode);
         }
 
         public override string ToString()

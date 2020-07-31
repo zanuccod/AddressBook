@@ -37,7 +37,7 @@ namespace AddressBook.API.Models.BaseModels
 
         private void CreateDatabaseIfNotExists()
         {
-            _logger.LogInformation("Source database <{0}>", _connectionString.ConnectionString);
+            _logger.LogInformation("Source database <{connectionString}>", _connectionString.ConnectionString);
 
             var targetDatabase = _connectionString.InitialCatalog;
 
@@ -49,7 +49,7 @@ namespace AddressBook.API.Models.BaseModels
             var isTargetDatabase = conn.ExecuteScalar<string>($"SELECT * FROM sys.databases WHERE name = '{targetDatabase}'");
             if (!string.IsNullOrEmpty(isTargetDatabase))
             {
-                _logger.LogDebug($"Database <{targetDatabase}> alredy exists, not need to create it");
+                _logger.LogDebug("Database <{targetDatabase}> alredy exists, not need to create it", targetDatabase);
                 _connectionString.InitialCatalog = targetDatabase;
                 return;
             }
@@ -61,12 +61,12 @@ namespace AddressBook.API.Models.BaseModels
             CreateTables(conn);
 
             _connectionString.InitialCatalog = targetDatabase;
-            _logger.LogInformation($"Database <{targetDatabase}> created");
+            _logger.LogInformation("Database <{targetDatabase}> created", targetDatabase);
         }
 
         private void CreateDatabase(SqlConnection conn, string targetDatabase)
         {
-            _logger.LogInformation("Database <{0}> not exists, creating it", targetDatabase);
+            _logger.LogInformation("Database <{targetDatabase}> not exists, creating it", targetDatabase);
             conn.Execute($"CREATE DATABASE {targetDatabase}");
         }
 

@@ -37,11 +37,11 @@ namespace AddressBook.API.Models.BaseModels
 
         private void CreateDatabaseIfNotExists()
         {
-            _logger.LogInformation("Source database <{0}>", _connectionString);
+            _logger.LogInformation("Source database <{connectionString}>", _connectionString);
             if (File.Exists(_connectionString))
                 return;
 
-            _logger.LogInformation("Database <{0}> not exists, creating it", _connectionString);
+            _logger.LogInformation("Database <{connectionString}> not exists, creating it", _connectionString);
 
             Directory.CreateDirectory("Data");
             SQLiteConnection.CreateFile(_connectionString);

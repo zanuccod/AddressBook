@@ -60,6 +60,7 @@ namespace AddressBook.API.Models.BaseModels
             table += "Name text NOT NULL, ";
             table += "Surname text NOT NULL, ";
             table += "Nickname text NULL, ";
+            table += "CountryId integer NULL, ";
             table += "PhoneNumber text NOT NULL)";
             conn.Execute(table);
 

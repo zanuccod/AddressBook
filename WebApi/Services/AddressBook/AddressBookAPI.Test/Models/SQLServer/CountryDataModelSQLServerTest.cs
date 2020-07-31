@@ -9,7 +9,7 @@ using NUnit.Framework;
 
 namespace AddressBookAPI.Test.Models.SQLServer
 {
-    public class CountryDataModelSQLServerTest
+    public class CountryDataModelSQLServerTest : BaseTest
     {
         private CountryDataModelSQServer _dataModel;
         private SqlConnectionStringBuilder builder;

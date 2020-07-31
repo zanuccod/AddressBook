@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Dapper.ColumnMapper;
 
 namespace AddressBook.API.Domains
 {
@@ -10,11 +11,14 @@ namespace AddressBook.API.Domains
         // autoincrement
         [Key]
         [Range(1, int.MaxValue)]
+        [ColumnMapping("CountryId")]
         public int Id { get; set; }
 
         [Required]
+        [ColumnMapping("CountryName")]
         public string Name { get; set; }
         [Required]
+        [ColumnMapping("CountryISOCode")]
         public string ISOCode { get; set; }
 
         #region Overridden Methods

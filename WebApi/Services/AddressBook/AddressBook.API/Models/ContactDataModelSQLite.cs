@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using AddressBook.API.Domains;
 using AddressBook.API.Models.BaseModels;
 using Dapper;
+using Dapper.ColumnMapper;
+using Dapper.Contrib.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -32,7 +34,16 @@ namespace AddressBook.API.Models
             using var conn = GetDbConnection();
             await conn.OpenAsync();
 
-            var result = await conn.QueryAsync<Contact>("SELECT * FROM Contacts");
+            var sqlCmd = "SELECT Contacts.Id as contactId, Contacts.Name as contactName, Contacts.Surname as contactSurname, ";
+            sqlCmd += "Contacts.Nickname as contactNickname, Contacts.PhoneNumber as contactPhoneNumber, Contacts.CountryId, ";
+            sqlCmd += "Countries.Id as countryId, Countries.Name as countryName, Countries.ISOCode as countryISOCode ";
+            sqlCmd += "FROM Contacts ";
+            sqlCmd += "LEFT OUTER JOIN Countries ON Countries.Id = Contacts.CountryId ";
+
+            var result = await conn.QueryAsync<Contact, Country, Contact>(
+                sqlCmd,
+                (contact, country) => { contact.Country = country; return contact; },
+                splitOn: "countryId");
             return result.ToList();
         }
 
@@ -41,7 +52,20 @@ namespace AddressBook.API.Models
             using var conn = GetDbConnection();
             await conn.OpenAsync();
 
-            return await conn.QueryFirstOrDefaultAsync<Contact>("SELECT * FROM Contacts WHERE id = @contactId", new { contactId = id });
+            var sqlCmd = "SELECT Contacts.Id as contactId, Contacts.Name as contactName, Contacts.Surname as contactSurname, ";
+            sqlCmd += "Contacts.Nickname as contactNickname, Contacts.PhoneNumber as contactPhoneNumber, Contacts.CountryId, ";
+            sqlCmd += "Countries.Id as countryId, Countries.Name as countryName, Countries.ISOCode as countryISOCode ";
+            sqlCmd += "FROM Contacts ";
+            sqlCmd += "LEFT OUTER JOIN Countries ON Countries.Id = Contacts.CountryId ";
+            sqlCmd += "WHERE Contacts.id = @contactId";
+
+            var result = await conn.QueryAsync<Contact, Country, Contact>(
+                sqlCmd,
+                (contact, country) => { contact.Country = country; return contact; },
+                splitOn: "countryId",
+                param: new { contactId = id });
+
+            return result.FirstOrDefault();
         }
 
         public async Task<int> InsertAsync(Contact item)
@@ -49,10 +73,10 @@ namespace AddressBook.API.Models
             using var conn = GetDbConnection();
             await conn.OpenAsync();
 
-            var sqlCmd = "INSERT INTO Contacts (Name, Surname, Nickname, PhoneNumber) VALUES (@Name, @Surname, @Nickname, @PhoneNumber);";
+            var sqlCmd = "INSERT INTO Contacts (Name, Surname, Nickname, CountryId, PhoneNumber) VALUES (@Name, @Surname, @Nickname, @CountryId, @PhoneNumber);";
             sqlCmd += "SELECT MAX(Id) FROM Contacts;";
 
-            return await conn.ExecuteScalarAsync<int>(sqlCmd, item);
+            return await conn.ExecuteScalarAsync<int>(sqlCmd, new { item.Name, item.Surname, item.Nickname, CountryId = item.Country?.Id, item.PhoneNumber});
         }
 
         public async Task<int> UpdateAsync(Contact item)
@@ -60,8 +84,8 @@ namespace AddressBook.API.Models
             using var conn = GetDbConnection();
             await conn.OpenAsync();
 
-            var sqlCmd = "UPDATE Contacts SET Name = @Name, Surname = @Surname, Nickname = @Nickname, PhoneNumber = @PhoneNumber WHERE id = @id";
-            return await conn.ExecuteAsync(sqlCmd, item);
+            var sqlCmd = "UPDATE Contacts SET Name = @Name, Surname = @Surname, Nickname = @Nickname, CountryId = @CountryId, PhoneNumber = @PhoneNumber WHERE id = @id";
+            return await conn.ExecuteAsync(sqlCmd, new { item.Name, item.Surname, item.Nickname, CountryId = item.Country?.Id, item.PhoneNumber, id = item.Id });
         }
 
         public async Task DeleteAsync(int id)

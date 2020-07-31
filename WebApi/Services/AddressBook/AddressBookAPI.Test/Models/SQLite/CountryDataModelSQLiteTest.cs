@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace AddressBookAPI.Test.Models.SQLite
 {
     [TestFixture]
-    public class CountryDataModelSQLiteTest
+    public class CountryDataModelSQLiteTest : BaseTest
     {
         private CountryDataModelSQLite _dataModel;
         private const string dbPath = "dbSqLiteTest";

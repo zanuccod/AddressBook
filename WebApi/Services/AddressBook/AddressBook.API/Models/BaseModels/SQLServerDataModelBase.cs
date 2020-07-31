@@ -73,19 +73,22 @@ namespace AddressBook.API.Models.BaseModels
         private void CreateTables(SqlConnection conn)
         {
             var table = "CREATE TABLE Countries (";
-            table += "Id integer IDENTITY(1,1), ";
+            table += "Id integer IDENTITY(1,1) PRIMARY KEY, ";
             table += "Name text NOT NULL, ";
             table += "ISOCode text NOT NULL)";
             conn.Execute(table);
 
             table = "CREATE TABLE Contacts (";
-            table += "Id integer IDENTITY(1,1), ";
+            table += "Id integer IDENTITY(1,1) NOT NULL, ";
             table += "Name text NOT NULL, ";
             table += "Surname text NOT NULL, ";
             table += "Nickname text NULL, ";
             table += "CountryId integer NULL, ";
             table += "PhoneNumber text NOT NULL,";
-            table += "FOREIGN KEY (CountryId) REFERENCES Countries(Id))";
+            table += "CONSTRAINT FK_Contacts_Countries FOREIGN KEY (CountryId) ";
+            table += "REFERENCES Countries(Id) ";
+            table += "ON DELETE CASCADE ";
+            table += "ON UPDATE CASCADE)";
             conn.Execute(table);
         }
 

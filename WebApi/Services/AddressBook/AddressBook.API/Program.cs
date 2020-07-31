@@ -1,5 +1,8 @@
 using System;
 using System.IO;
+using AddressBook.API.Domains;
+using Dapper;
+using Dapper.ColumnMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -24,6 +27,8 @@ namespace AddressBook.API
             {
                 Log.Information("Starting up");
                 CreateHostBuilder(args).Build().Run();
+
+                InitDapperColumnsMapping();
             }
             catch (Exception ex)
             {
@@ -42,5 +47,12 @@ namespace AddressBook.API
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+
+        // to allow reead data from multiple tables with join and custom columns names
+        public static void InitDapperColumnsMapping()
+        {
+            SqlMapper.SetTypeMap(typeof(Contact), new ColumnTypeMapper(typeof(Contact)));
+            SqlMapper.SetTypeMap(typeof(Country), new ColumnTypeMapper(typeof(Country)));
+        }
     }
 }
